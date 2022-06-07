@@ -4,6 +4,7 @@ namespace pocketmine\utils;
 
 use pocketmine\entity\Entity;
 use pocketmine\network\protocol\Info;
+use pocketmine\utils\BCBitwise;
 
 class MetadataConvertor {
 
@@ -264,18 +265,18 @@ class MetadataConvertor {
             case Info::PROTOCOL_423:
             case Info::PROTOCOL_422:
             case Info::PROTOCOL_419:
-				$newflags = 1 << 19; //DATA_FLAG_CAN_CLIMBING
+				$newflags = BCBitwise::leftShift("1", "19"); //DATA_FLAG_CAN_CLIMBING
 				$protocolFlags = self::$entityFlags290;
 				break;
 			default:
 				throw new \InvalidArgumentCountException("Unknown protocol $protocol");
 		}
 		
-		$flags = strrev(decbin($meta[Entity::DATA_FLAGS][1]));
+		$flags = strrev(BCBitwise::decToBin($meta[Entity::DATA_FLAGS][1]));
 		$flagsLength = strlen($flags);
 		for ($i = 0; $i < $flagsLength; $i++) {
 			if ($flags[$i] === '1') {
-				$newflags |= 1 << (isset($protocolFlags[$i]) ? $protocolFlags[$i] : $i);
+				$newflags |= BCBitwise::bitwiseOr((string) $newflags, BCBitwise::leftShift("1", isset($protocolFlags[$i]) ? $protocolFlags[$i] : (string) $i));
 			}
 		}
 		$meta[Entity::DATA_FLAGS][1] = $newflags;
