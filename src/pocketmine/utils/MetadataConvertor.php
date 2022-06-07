@@ -276,7 +276,7 @@ class MetadataConvertor {
 		$flagsLength = strlen($flags);
 		for ($i = 0; $i < $flagsLength; $i++) {
 			if ($flags[$i] === '1') {
-				$newflags |= BCBitwise::bitwiseOr((string) $newflags, BCBitwise::leftShift("1", isset($protocolFlags[$i]) ? $protocolFlags[$i] : (string) $i));
+				$newflags = BCBitwise::bitwiseOr((string) $newflags, BCBitwise::leftShift("1", isset($protocolFlags[$i]) ? $protocolFlags[$i] : (string) $i));
 			}
 		}
 		$meta[Entity::DATA_FLAGS][1] = $newflags;
