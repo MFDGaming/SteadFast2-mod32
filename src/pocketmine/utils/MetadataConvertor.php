@@ -4,7 +4,6 @@ namespace pocketmine\utils;
 
 use pocketmine\entity\Entity;
 use pocketmine\network\protocol\Info;
-use pocketmine\utils\BCBitwise;
 
 class MetadataConvertor {
 
@@ -218,6 +217,9 @@ class MetadataConvertor {
 
 	private static function updateMetaIds($meta, $protocol) {
 		switch ($protocol) {
+			case Info::PROTOCOL_526:
+			case Info::PROTOCOL_503:
+			case Info::PROTOCOL_486:
 			case Info::PROTOCOL_475:
 			case Info::PROTOCOL_471:
 			case Info::PROTOCOL_465:
@@ -249,6 +251,9 @@ class MetadataConvertor {
 			return $meta;
 		}
 		switch ($protocol) {
+			case Info::PROTOCOL_526:
+			case Info::PROTOCOL_503:
+			case Info::PROTOCOL_486:
 			case Info::PROTOCOL_475:
 			case Info::PROTOCOL_471:
 			case Info::PROTOCOL_465:
@@ -259,19 +264,18 @@ class MetadataConvertor {
             case Info::PROTOCOL_423:
             case Info::PROTOCOL_422:
             case Info::PROTOCOL_419:
-				$newflags = BCBitwise::leftShift("1", "19"); //DATA_FLAG_CAN_CLIMBING
+				$newflags = 1 << 19; //DATA_FLAG_CAN_CLIMBING
 				$protocolFlags = self::$entityFlags290;
 				break;
 			default:
 				throw new \InvalidArgumentCountException("Unknown protocol $protocol");
 		}
-		$flags = strrev(BCBitwise::decToBin($meta[Entity::DATA_FLAGS][1]));
-
-
+		
+		$flags = strrev(decbin($meta[Entity::DATA_FLAGS][1]));
 		$flagsLength = strlen($flags);
 		for ($i = 0; $i < $flagsLength; $i++) {
 			if ($flags[$i] === '1') {
-				$newflags = BCBitwise::bitwiseOr((string) $newflags, BCBitwise::leftShift("1", isset($protocolFlags[$i]) ? $protocolFlags[$i] : (string) $i));
+				$newflags |= 1 << (isset($protocolFlags[$i]) ? $protocolFlags[$i] : $i);
 			}
 		}
 		$meta[Entity::DATA_FLAGS][1] = $newflags;
